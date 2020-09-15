@@ -1,4 +1,4 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, generics
 from api.models import Post, Comment, Group, Follow
 from api.serializers import PostSerializer, CommentSerializer, GroupSerializer, FollowSerializer
 from api.permissions import OwnResourcePermission, OwnFollowerPermission
@@ -18,7 +18,7 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentAPI(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [OwnResourcePermission, IsAuthenticated]
 
@@ -31,13 +31,13 @@ class CommentViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class GroupViewSet(viewsets.ModelViewSet):
+class GroupAPIView(generics.ListCreateAPIView):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [OwnResourcePermission]
 
 
-class FollowViewSet(viewsets.ModelViewSet):
+class FollowAPIView(generics.ListCreateAPIView):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
     permission_classes = [OwnFollowerPermission]
