@@ -4,22 +4,18 @@ from api.serializers import PostSerializer, CommentSerializer, GroupSerializer, 
 from api.permissions import OwnResourcePermission, OwnFollowerPermission
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [OwnResourcePermission]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['group']
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
-    def get_queryset(self):
-        queryset = Post.objects.all()
-        group = self.request.query_params.get('group', None)
-        if group is not None:
-            queryset = queryset.filter(group=group)
-        return queryset
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -47,3 +43,4 @@ class FollowViewSet(viewsets.ModelViewSet):
     permission_classes = [OwnFollowerPermission]
     filter_backends = [filters.SearchFilter]
     search_fields = ['=user__username', '=following__username']
+
